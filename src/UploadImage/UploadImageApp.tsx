@@ -1,17 +1,23 @@
+import type { Dispatch, SetStateAction } from "react";
 import ImageUpload from "./ImageUpload";
 import type { ImageUrl } from "./types";
 
 interface AppProps {
-  imageArray: ImageUrl[];
+  imageUrlArray: ImageUrl[];
   entireWindowsWidth: string;
   previewImageWidth: string;
   previewImageHeight: string;
+  imageSizeRequired: number;
+  setImageUrlArray: Dispatch<SetStateAction<ImageUrl[]>>;
 }
 
 export default function UploadImageApp({
   entireWindowsWidth,
   previewImageWidth,
   previewImageHeight,
+  imageSizeRequired,
+  imageUrlArray,
+  setImageUrlArray,
 }: AppProps) {
   return (
     <>
@@ -19,6 +25,9 @@ export default function UploadImageApp({
         entireWindowsWidth={entireWindowsWidth}
         previewImageWidth={previewImageWidth}
         previewImageHeight={previewImageHeight}
+        imageSizeRequired={imageSizeRequired}
+        imageUrlArray={imageUrlArray}
+        setImageUrlArray={setImageUrlArray}
       />
     </>
   );

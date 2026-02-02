@@ -47,8 +47,8 @@ export default function ImagePreviewItem({
 
                     <div className="w-full h-full flex flex-col items-center justify-center relative group-hover:bg-black/50 group-hover:brightness-50 rounded-xl transition-all duration-300">
                       <Image color="red" size={30} />
-                      <span className="text-xs text-red-500 font-medium">
-                        Upload Error
+                      <span className="text-xs text-center text-red-500 font-medium">
+                        {image.errorMsg}
                       </span>
                     </div>
                   </div>

@@ -4,4 +4,5 @@ export interface ImageUrl {
   status: "uploading" | "done" | "error";
   url: string;
   progress: number;
+  errorMsg: string;
 }

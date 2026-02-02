@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 import type { ImageUrl } from "./types";
 import ImageZoomIn from "./ImageZoomIn";
 import ImagePreviewItem from "./ImagePreviewItem";
@@ -7,18 +7,23 @@ interface ImageUploadProps {
   entireWindowsWidth: string;
   previewImageWidth: string;
   previewImageHeight: string;
+  imageSizeRequired: number;
+  imageUrlArray: ImageUrl[];
+  setImageUrlArray: Dispatch<SetStateAction<ImageUrl[]>>;
 }
 
 export default function ImageUpload({
   entireWindowsWidth,
   previewImageWidth,
   previewImageHeight,
+  imageSizeRequired = 5 * 1024 * 1024,
+  imageUrlArray,
+  setImageUrlArray,
 }: ImageUploadProps) {
   //useRef to handle hidden file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   //state declarations
-  const [imageUrlArray, setImageUrlArray] = useState<ImageUrl[]>([]);
   const [isZoomIn, setIsZoomIn] = useState(false);
   const [zoomInImage, setZoomInImage] = useState<ImageUrl>();
 
@@ -30,9 +35,24 @@ export default function ImageUpload({
   //Hidden file input element
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
     if (files && files.length > 0) {
       const newUid = crypto.randomUUID();
       const file = files[0];
+
+      let isError = false;
+      let errorMsg = "";
+
+      if (file.size > imageSizeRequired) {
+        errorMsg = "File is too big! Max 5MB.";
+        isError = true;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        errorMsg = "Only image files are allowed.";
+        isError = true;
+      }
 
       const tempUrl = URL.createObjectURL(file);
 
@@ -42,13 +62,14 @@ export default function ImageUpload({
         status: "uploading",
         url: tempUrl,
         progress: 0,
+        errorMsg: "",
       };
 
       setImageUrlArray((prev) => [...prev, newImageItem]);
 
       const getNextProgress = (currentProgress: number) => {
         const next = currentProgress + 20;
-        return next >= 90 ? 90 : next;
+        return next >= 90 ? 100 : next;
       };
 
       //uploading progress bar...?
@@ -71,8 +92,6 @@ export default function ImageUpload({
       setTimeout(() => {
         clearInterval(uploadInterval);
 
-        const isError = file.name.toLowerCase().includes("error");
-
         setImageUrlArray((prevArray) =>
           prevArray.map((img) => {
             //find specific image in an array by UID
@@ -81,6 +100,7 @@ export default function ImageUpload({
                 ...img,
                 status: isError ? "error" : "done",
                 progress: 100,
+                errorMsg: errorMsg,
               };
             }
 
@@ -88,6 +108,7 @@ export default function ImageUpload({
           }),
         );
       }, 2000);
+      isError = false;
     }
     event.target.value = "";
   };
@@ -120,7 +141,7 @@ export default function ImageUpload({
 
   return (
     <>
-      <div className={`w-${entireWindowsWidth}`}>
+      <div className={`${entireWindowsWidth}`}>
         <ImageZoomIn
           isZoomIn={isZoomIn}
           onCloseZoomIn={handleCloseZoomIn}
