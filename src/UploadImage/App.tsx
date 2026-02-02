@@ -11,6 +11,7 @@ interface ImageUrl {
 
 export default function UploadImageApp() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [imageUrlArray, setImageUrlArray] = useState<ImageUrl[]>([]);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [progress, setProgress] = useState(0);
@@ -54,6 +55,7 @@ export default function UploadImageApp() {
             name: file.name,
           };
           setImageUrlArray((prev) => [...prev, newImage]);
+          setStatus("success");
         } else {
           const newUrl = URL.createObjectURL(file);
           const newImage = {
@@ -66,7 +68,7 @@ export default function UploadImageApp() {
           setProgress(100);
           setStatus("success");
         }
-      }, 2000);
+      }, 5000);
     }
     event.target.value = "";
   };
@@ -188,7 +190,7 @@ export default function UploadImageApp() {
           ))}
 
           {/* Uploading Progress Bar */}
-          {status === "uploading" && (
+          {status === "uploading" &&  (
             <div
               className="w-40 h-40 border border-dashed border-gray-300 rounded-xl flex flex-col 
             items-center justify-center bg-gray-50 p-4 animate-[popIn_0.5s_ease-out_forwards]"
