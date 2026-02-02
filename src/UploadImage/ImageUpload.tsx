@@ -1,9 +1,19 @@
 import { useRef, useState } from "react";
-import type { ImageUrl } from "../components/interface/types";
+import type { ImageUrl } from "./types";
 import ImageZoomIn from "./ImageZoomIn";
 import ImagePreviewItem from "./ImagePreviewItem";
-// import { zoomInReducer, type State } from "../components/reducer/zoomInReducer";
-export default function UploadImageApp() {
+
+interface ImageUploadProps {
+  entireWindowsWidth: string;
+  previewImageWidth: string;
+  previewImageHeight: string;
+}
+
+export default function ImageUpload({
+  entireWindowsWidth,
+  previewImageWidth,
+  previewImageHeight,
+}: ImageUploadProps) {
   //useRef to handle hidden file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,7 +120,7 @@ export default function UploadImageApp() {
 
   return (
     <>
-      <div className="w-full">
+      <div className={`w-${entireWindowsWidth}`}>
         <ImageZoomIn
           isZoomIn={isZoomIn}
           onCloseZoomIn={handleCloseZoomIn}
@@ -124,6 +134,9 @@ export default function UploadImageApp() {
           handleFileChange={handleFileChange}
           handleRemoveImage={handleRemoveImage}
           handleZoomInImage={handleZoomInImage}
+          //css passing
+          previewImageWidth={previewImageWidth}
+          previewImageHeight={previewImageHeight}
         />
 
         <input

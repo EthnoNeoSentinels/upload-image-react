@@ -4,11 +4,17 @@ import { useRef } from "react";
 interface UploadButtonProps {
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleButtonClick: () => void;
+
+  //css passing
+  previewImageWidth: number | string;
+  previewImageHeight: number | string;
 }
 
 export function UploadButton({
   handleFileChange,
   handleButtonClick,
+  previewImageWidth = "w-40",
+  previewImageHeight = "w-40",
 }: UploadButtonProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -17,7 +23,7 @@ export function UploadButton({
       <button
         type="button"
         className={`
-          flex flex-col items-center justify-center text-center h-40 w-40 shrink-0
+          flex flex-col items-center justify-center text-center ${previewImageHeight} ${previewImageWidth} shrink-0
           box-border border-2 border-dashed text-[14px] 
           rounded-lg transition-all duration-500 ease-out cursor-pointer
           border-[#dbdbdb] hover:border-[#1677ff] hover:text-[#1677ff]

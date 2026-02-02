@@ -1,6 +1,6 @@
 import { Trash, Image, Eye } from "lucide-react";
 import { UploadButton } from "./UploadButton";
-import type { ImageUrl } from "../components/interface/types";
+import type { ImageUrl } from "./types";
 
 interface ImagePreviewItemProps {
   imageUrlArray: ImageUrl[];
@@ -8,6 +8,10 @@ interface ImagePreviewItemProps {
   handleZoomInImage: (uid: string) => void;
   handleButtonClick: () => void;
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+
+  //css passing
+  previewImageWidth: string;
+  previewImageHeight: string;
 }
 
 export default function ImagePreviewItem({
@@ -16,17 +20,23 @@ export default function ImagePreviewItem({
   handleZoomInImage,
   handleFileChange,
   handleButtonClick,
+  previewImageWidth = "w-40",
+  previewImageHeight = "w-40",
+
+  //css passing
 }: ImagePreviewItemProps) {
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 justify-center items-center mt-4 mx-5 justify-items-center">
+      <div className="flex flex-wrap mt-4 mx-5 gap-2">
         {/* Preview Image */}
         {imageUrlArray.map((image) => (
           <>
             <div key={image.uid}>
               {image.status === "error" && (
                 <>
-                  <div className="group w-40 h-40 border-2 border-red-400 bg-gray-400/20 rounded-xl relative p-2">
+                  <div
+                    className={`group ${previewImageWidth} ${previewImageHeight} border-2 border-red-400 bg-gray-400/20 rounded-xl relative p-2`}
+                  >
                     <button
                       onClick={() => handleRemoveImage(image.uid)}
                       className="absolute z-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer
@@ -47,15 +57,17 @@ export default function ImagePreviewItem({
 
               {image.status === "done" && image.progress === 100 && (
                 <>
-                  <div className="h-40 w-40 border border-gray-300 rounded-xl group ">
+                  <div
+                    className={`w-fit h-fit border border-gray-300 rounded-xl group`}
+                  >
                     {/* Image */}
                     <div className="relative">
                       <img
                         src={image.url}
                         alt="Preview"
-                        className="w-40 h-40 object-cover rounded-xl shadow-sm 
+                        className={`${previewImageWidth} ${previewImageHeight} object-cover rounded-xl shadow-sm 
                      block p-2 animate-[popIn_0.4s_ease-out_forwards] 
-                    group-hover:brightness-50 transition-all duration-500"
+                    group-hover:brightness-50 transition-all duration-500`}
                       />
                       {/* Hover Icons */}
                       <div className="z-30 text-white opacity-0 flex space-x-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
@@ -80,8 +92,8 @@ export default function ImagePreviewItem({
               {/* Uploading Progress Bar */}
               {image.status === "uploading" && (
                 <div
-                  className="w-40 h-40 border border-dashed border-gray-300 rounded-xl flex flex-col 
-            items-center justify-center bg-gray-50 p-4 animate-[popIn_0.5s_ease-out_forwards]"
+                  className={`${previewImageWidth} ${previewImageHeight} border border-dashed border-gray-300 rounded-xl flex flex-col 
+            items-center justify-center bg-gray-50 p-4 animate-[popIn_0.5s_ease-out_forwards]`}
                 >
                   <div className="text-sm text-gray-600 mb-2 font-medium">
                     Uploading...
@@ -101,6 +113,9 @@ export default function ImagePreviewItem({
         <UploadButton
           handleButtonClick={handleButtonClick}
           handleFileChange={() => handleFileChange}
+          //css passing
+          previewImageWidth={previewImageWidth}
+          previewImageHeight={previewImageHeight}
         />
       </div>
     </>
