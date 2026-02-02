@@ -1,4 +1,4 @@
-import type { ImageUrl } from "../interface/types";
+import type { ImageUrl } from "../components/interface/types";
 import { X } from "lucide-react";
 
 interface imageZoomInProps {

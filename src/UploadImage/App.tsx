@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
-import type { ImageUrl } from "../interface/types";
+import type { ImageUrl } from "../components/interface/types";
 import ImageZoomIn from "./ImageZoomIn";
 import ImagePreviewItem from "./ImagePreviewItem";
+// import { zoomInReducer, type State } from "../components/reducer/zoomInReducer";
 export default function UploadImageApp() {
   //useRef to handle hidden file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -91,7 +92,7 @@ export default function UploadImageApp() {
     }
   };
 
-  const handleCloseZoom = () => setIsZoomIn(false);
+  const handleCloseZoomIn = () => setIsZoomIn(false);
 
   const handleRemoveImage = (uid: string) => {
     //the image uid not same is remain,
@@ -112,25 +113,25 @@ export default function UploadImageApp() {
       <div className="w-full">
         <ImageZoomIn
           isZoomIn={isZoomIn}
-          onCloseZoomIn={handleCloseZoom}
+          onCloseZoomIn={handleCloseZoomIn}
           zoomInImage={zoomInImage}
         />
 
         <ImagePreviewItem
-          // Pass in array
+          // Allow to pass in array
           imageUrlArray={imageUrlArray}
           handleButtonClick={handleButtonClick}
+          handleFileChange={handleFileChange}
           handleRemoveImage={handleRemoveImage}
           handleZoomInImage={handleZoomInImage}
         />
 
-        {/* Hidden file upload input element */}
         <input
           ref={fileInputRef}
           type="file"
           hidden
-          onChange={handleFileChange}
           accept="image/*"
+          onChange={handleFileChange}
         />
       </div>
     </>

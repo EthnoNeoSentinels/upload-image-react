@@ -1,19 +1,21 @@
 import { Trash, Image, Eye } from "lucide-react";
 import { UploadButton } from "./UploadButton";
-import type { ImageUrl } from "../interface/types";
+import type { ImageUrl } from "../components/interface/types";
 
 interface ImagePreviewItemProps {
   imageUrlArray: ImageUrl[];
   handleRemoveImage: (uid: string) => void;
   handleZoomInImage: (uid: string) => void;
-  handleButtonClick: () => void
+  handleButtonClick: () => void;
+  handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function ImagePreviewItem({
   imageUrlArray,
   handleRemoveImage,
   handleZoomInImage,
-  handleButtonClick
+  handleFileChange,
+  handleButtonClick,
 }: ImagePreviewItemProps) {
   return (
     <>
@@ -96,7 +98,10 @@ export default function ImagePreviewItem({
           </>
         ))}
 
-        <UploadButton onClick={handleButtonClick} />
+        <UploadButton
+          handleButtonClick={handleButtonClick}
+          handleFileChange={() => handleFileChange}
+        />
       </div>
     </>
   );
