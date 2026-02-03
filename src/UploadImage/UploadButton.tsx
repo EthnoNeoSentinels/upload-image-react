@@ -1,5 +1,4 @@
 import { Plus } from "lucide-react";
-import { useRef } from "react";
 
 interface UploadButtonProps {
   handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -11,12 +10,10 @@ interface UploadButtonProps {
 }
 
 export function UploadButton({
-  handleFileChange,
   handleButtonClick,
   previewImageWidth = "w-40",
   previewImageHeight = "w-40",
 }: UploadButtonProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <>
@@ -36,13 +33,6 @@ export function UploadButton({
         </span>
         <div>Upload</div>
       </button>
-      <input
-        ref={fileInputRef}
-        type="file"
-        hidden
-        onChange={handleFileChange}
-        accept="image/*"
-      />
     </>
   );
 }
