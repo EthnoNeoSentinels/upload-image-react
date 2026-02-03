@@ -37,6 +37,7 @@ export default function ImagePreviewItem({
         {imageUrlArray.map((image) => (
           <>
             <div key={image.uid}>
+              {/* error box */}
               {image.status === "error" && (
                 <>
                   <div
@@ -59,10 +60,12 @@ export default function ImagePreviewItem({
                   </div>
                 </>
               )}
-
+              
+              {/* done box */}
               {image.status === "done" && image.progress === 100 && (
                 <>
-                  <div key={image.uid}
+                  <div
+                    key={image.uid}
                     className={`w-fit h-fit border border-gray-300 rounded-xl group`}
                   >
                     {/* Image */}
@@ -94,9 +97,10 @@ export default function ImagePreviewItem({
                 </>
               )}
 
-              {/* Uploading Progress Bar */}
+              {/* loading box */}
               {image.status === "uploading" && (
-                <div key={image.uid}
+                <div
+                  key={image.uid}
                   className={`${previewImageWidth} ${previewImageHeight} border border-dashed border-gray-300 rounded-xl flex flex-col 
             items-center justify-center bg-gray-50 p-4 animate-[imagePreviewPopInAnimation4417_0.5s_ease-out_forwards]`}
                 >

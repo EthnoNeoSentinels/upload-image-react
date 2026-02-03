@@ -45,19 +45,46 @@ export default function ImageZoomIn({
     // preventing parent elements from receiving the same event
     e.stopPropagation();
 
-    const zoomSensitivity = 0.1;
+    //define the spped to zoom the image
+    //you can change this to large value to 
+    // increase the zoom to be faster
+    const zoomSensitivity = 0.2;
+    //control the scroll direction to add or minus
+    //if < 0 means (zoom in) zoomSensitivity is positive
+    //if > 0 means (zoom out) zoomSensitivity is negative
     const delta = e.deltaY < 0 ? zoomSensitivity : -zoomSensitivity;
-    const newScale = Math.min(Math.max(0.5, scale + delta), 10);
+    // calculate the final size to enforce safety imits
+    // This code adjusts a size value by adding a change (delta) to it, 
+    // but it makes sure the size stays 
+    // between a minimum of 0.5 and a maximum of 10. 
+    // If the result is smaller than 0.5, it sets it to 0.5. 
+    // If it's bigger than 10, it sets it to 10. 
+    // Basically, it calculates the new size but caps it 
+    // so it doesn’t get too small or too big.
+
+    //Just a Basic limitation setting to do (minumum = 0.5*100=50%, maximum = 5*100 = 500%)
+    const newScale = Math.min(Math.max(0.5, scale + delta), 5);
+    //update image scale!
     setScale(newScale);
   };
 
   //Drag function==========================================================================================================
   // handle the mouse is holding (mouse down)
   const handleMouseDown = (e: React.MouseEvent) => {
+    // stops the browser from doing what it normally does 
+    // when you click and drag
+    // It is showing a ghost image that you can drop somewhere 
     e.preventDefault();
+    //the user is holding mouse button down
     setIsDragging(true);
     //calculate the mouse position and currect Image Position
+    // saves the starting point where the drag began, 
+    // so later the program can figure out how far you have moved.
     dragStart.current = {
+      // calculation that figures out the difference 
+      // between where the mouse is now and 
+      // where the element initially was, 
+      // helping to move the element smoothly as you drag.
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     };
@@ -69,6 +96,9 @@ export default function ImageZoomIn({
     e.preventDefault();
     e.stopPropagation()
     
+    //calculates how far you have moved the mouse from 
+    // where you started dragging, and 
+    // updates the position of the object accordingly.
     const newX = e.clientX - dragStart.current.x;
     const newY = e.clientY - dragStart.current.y;
 
