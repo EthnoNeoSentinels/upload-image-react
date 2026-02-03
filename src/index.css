@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@keyframes popIn {
+@keyframes imagePreviewPopInAnimation4417 {
   0% {
     transform: scale(0);
     opacity: 0;

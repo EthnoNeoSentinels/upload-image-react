@@ -71,7 +71,7 @@ export default function ImagePreviewItem({
                         src={image.url}
                         alt="Preview"
                         className={`${previewImageWidth} ${previewImageHeight} object-cover rounded-xl shadow-sm 
-                     block p-2 animate-[popIn_0.4s_ease-out_forwards] 
+                     block p-2 animate-[imagePreviewPopInAnimation4417_0.4s_ease-out_forwards] 
                     group-hover:brightness-50 transition-all duration-500`}
                       />
                       {/* Hover Icons */}
@@ -98,7 +98,7 @@ export default function ImagePreviewItem({
               {image.status === "uploading" && (
                 <div key={image.uid}
                   className={`${previewImageWidth} ${previewImageHeight} border border-dashed border-gray-300 rounded-xl flex flex-col 
-            items-center justify-center bg-gray-50 p-4 animate-[popIn_0.5s_ease-out_forwards]`}
+            items-center justify-center bg-gray-50 p-4 animate-[imagePreviewPopInAnimation4417_0.5s_ease-out_forwards]`}
                 >
                   <div className="text-sm text-gray-600 mb-2 font-medium">
                     Uploading...
