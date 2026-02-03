@@ -23,14 +23,14 @@ export default function ImageZoomIn({
           >
             <X color="white" />
           </button>
-          <div className="relative bg-white w-100 h-100 mx-auto top-1/2 -translate-y-1/2">
+          <div className="relative bg-white w-fit h-100 mx-auto top-1/2 -translate-y-1/2">
             {zoomInImage && (
               <>
                 <img
                   key={zoomInImage.uid}
                   src={zoomInImage.url}
                   alt={zoomInImage.name}
-                  className="w-full h-full"
+                  className="w-full h-full object-cover"
                 />
               </>
             )}

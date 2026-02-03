@@ -8,6 +8,8 @@ interface AppProps {
   previewImageWidth: string;
   previewImageHeight: string;
   imageSizeRequired: number;
+  imageSizeText: string;
+  previewImageGap: string;
   setImageUrlArray: Dispatch<SetStateAction<ImageUrl[]>>;
 }
 
@@ -18,6 +20,8 @@ export default function UploadImageApp({
   imageSizeRequired,
   imageUrlArray,
   setImageUrlArray,
+  imageSizeText = "5MB",
+  previewImageGap,
 }: AppProps) {
   return (
     <>
@@ -28,6 +32,8 @@ export default function UploadImageApp({
         imageSizeRequired={imageSizeRequired}
         imageUrlArray={imageUrlArray}
         setImageUrlArray={setImageUrlArray}
+        imageSizeText={imageSizeText}
+        previewImageGap={previewImageGap}
       />
     </>
   );

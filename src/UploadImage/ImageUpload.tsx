@@ -10,15 +10,24 @@ interface ImageUploadProps {
   imageSizeRequired: number;
   imageUrlArray: ImageUrl[];
   setImageUrlArray: Dispatch<SetStateAction<ImageUrl[]>>;
+  imageSizeText: string;
+  previewImageGap: string;
 }
 
 export default function ImageUpload({
+  //array passing
+  imageUrlArray,
+  setImageUrlArray,
+
+  //size passing
+  imageSizeRequired = 5 * 1024 * 1024,
+  imageSizeText = "5MB",
+
+  //css passing
   entireWindowsWidth,
   previewImageWidth,
   previewImageHeight,
-  imageSizeRequired = 5 * 1024 * 1024,
-  imageUrlArray,
-  setImageUrlArray,
+  previewImageGap,
 }: ImageUploadProps) {
   //useRef to handle hidden file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,81 +45,84 @@ export default function ImageUpload({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
-    
-    if (files && files.length > 0) {
-      const newUid = crypto.randomUUID();
-      const file = files[0];
 
-      let isError = false;
-      let errorMsg = "";
+    //file info
+    //define file random id
+    const newUid = crypto.randomUUID();
+    // receive the file
+    const file = files[0];
+    //create blob url for the file
+    const tempUrl = URL.createObjectURL(file);
 
-      if (file.size > imageSizeRequired) {
-        errorMsg = "File is too big! Max 5MB.";
-        isError = true;
-      }
+    //check for file format in local
+    let isError = false;
+    let errorMsg = "";
 
-      if (!file.type.startsWith("image/")) {
-        errorMsg = "Only image files are allowed.";
-        isError = true;
-      }
-
-      const tempUrl = URL.createObjectURL(file);
-
-      const newImageItem: ImageUrl = {
-        uid: newUid,
-        name: file.name,
-        status: "uploading",
-        url: tempUrl,
-        progress: 0,
-        errorMsg: "",
-      };
-
-      setImageUrlArray((prev) => [...prev, newImageItem]);
-
-      const getNextProgress = (currentProgress: number) => {
-        const next = currentProgress + 20;
-        return next >= 90 ? 100 : next;
-      };
-
-      //uploading progress bar...?
-      const uploadInterval = setInterval(() => {
-        setImageUrlArray((prevArray) => {
-          return prevArray.map((image) => {
-            //check any exist uid and the image is not in uploading
-            if (image.uid != newUid || image.status !== "uploading") {
-              return image;
-            }
-            return {
-              ...image,
-              progress: getNextProgress(image.progress),
-            };
-          });
-        });
-      }, 200);
-
-      //simulation of uploading image
-      setTimeout(() => {
-        clearInterval(uploadInterval);
-
-        setImageUrlArray((prevArray) =>
-          prevArray.map((img) => {
-            //find specific image in an array by UID
-            if (img.uid === newUid) {
-              return {
-                ...img,
-                status: isError ? "error" : "done",
-                progress: 100,
-                errorMsg: errorMsg,
-              };
-            }
-
-            return img;
-          }),
-        );
-      }, 2000);
-      isError = false;
+    if (!file.type.startsWith("image/")) {
+      errorMsg = "Only image files are allowed.";
+      isError = true;
+    } else if (file.size > imageSizeRequired) {
+      errorMsg = "File is too big! Max " + imageSizeText + ".";
+      isError = true;
     }
+
+    // Prepare to insert image in uploading / error status
+    const newImageItem: ImageUrl = {
+      uid: newUid,
+      name: file.name,
+      status: isError ? "error" : "uploading",
+      url: tempUrl,
+      progress: 0,
+      errorMsg: isError ? errorMsg : "",
+    };
+
+    setImageUrlArray((prev) => [...prev, newImageItem]);
+
     event.target.value = "";
+
+    //if any error occur before, it interrupt the action,
+    // no going to check network error
+    if (isError) {
+      return;
+    }
+
+    // A. The Progress Timer (Ticks every 200ms)
+    const uploadInterval = setInterval(() => {
+      setImageUrlArray((prevArray) => {
+        return prevArray.map((image) => {
+          // Only update THIS specific image
+          if (image.uid !== newUid || image.status !== "uploading") {
+            return image;
+          }
+
+          // Cap simulated progress at 90% until finished
+          const nextProgress = image.progress + 20;
+          return {
+            ...image,
+            progress: nextProgress >= 90 ? 90 : nextProgress,
+          };
+        });
+      });
+    }, 200);
+
+    // B. The Finish Timer (Finishes after 2 seconds)
+    setTimeout(() => {
+      clearInterval(uploadInterval); // Stop the progress ticker
+
+      // Mark as done
+      updateImageStatus(newUid, {
+        status: "done",
+        progress: 100,
+      });
+    }, 2000);
+
+    //axios
+  };
+
+  const updateImageStatus = (uid: string, updates: Partial<ImageUrl>) => {
+    setImageUrlArray((prev) =>
+      prev.map((img) => (img.uid === uid ? { ...img, ...updates } : img)),
+    );
   };
 
   const handleZoomInImage = (uid: string) => {
@@ -158,6 +170,7 @@ export default function ImageUpload({
           //css passing
           previewImageWidth={previewImageWidth}
           previewImageHeight={previewImageHeight}
+          previewImageGap={previewImageGap}
         />
 
         <input

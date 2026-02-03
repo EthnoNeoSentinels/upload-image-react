@@ -5,6 +5,8 @@ import UploadImageApp from "./UploadImage/UploadImageApp";
 function App() {
   const [imageUrlArray, setImageUrlArray] = useState<ImageUrl[]>([]);
 
+  // console.log(imageUrlArray);
+
   return (
     <>
       <div className="w-full flex">
@@ -19,12 +21,12 @@ function App() {
           //Fraction (1/2, 1/3, 1/4 ...etc)
           // if using px, place enclose the number with brackets --> Example [100px]
           entireWindowsWidth="w-1/2"
-          // default width is 40, write in number or [100px]
-          previewImageWidth={"w-30"}
-          // default height is 40, write in number or [100px]
-          previewImageHeight={"h-30"}
-          //default is 5MB
-          imageSizeRequired={5 * 1024 * 1024}
+          previewImageWidth="w-40" // default width is 40
+          previewImageHeight="h-40" // default height is 40
+          previewImageGap="gap-2" //default is 2
+          imageSizeRequired={5 * 1024 * 1024} //default is 5MB
+          imageSizeText="5MB" //if any size is modify change the text at here
+
         />
       </div>
     </>

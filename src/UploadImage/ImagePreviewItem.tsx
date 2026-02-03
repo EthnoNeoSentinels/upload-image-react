@@ -12,22 +12,27 @@ interface ImagePreviewItemProps {
   //css passing
   previewImageWidth: string;
   previewImageHeight: string;
+  previewImageGap: string;
 }
 
 export default function ImagePreviewItem({
+  // array passing
   imageUrlArray,
+
+  //function passing
   handleRemoveImage,
   handleZoomInImage,
   handleFileChange,
   handleButtonClick,
-  previewImageWidth = "w-40",
-  previewImageHeight = "w-40",
 
   //css passing
+  previewImageWidth = "w-40",
+  previewImageHeight = "w-40",
+  previewImageGap = "gap-2",
 }: ImagePreviewItemProps) {
   return (
     <>
-      <div className="flex flex-wrap mt-4 mx-5 gap-2">
+      <div className={`flex flex-wrap mt-4 mx-5 ${previewImageGap}`}>
         {/* Preview Image */}
         {imageUrlArray.map((image) => (
           <>
@@ -57,7 +62,7 @@ export default function ImagePreviewItem({
 
               {image.status === "done" && image.progress === 100 && (
                 <>
-                  <div
+                  <div key={image.uid}
                     className={`w-fit h-fit border border-gray-300 rounded-xl group`}
                   >
                     {/* Image */}
@@ -91,7 +96,7 @@ export default function ImagePreviewItem({
 
               {/* Uploading Progress Bar */}
               {image.status === "uploading" && (
-                <div
+                <div key={image.uid}
                   className={`${previewImageWidth} ${previewImageHeight} border border-dashed border-gray-300 rounded-xl flex flex-col 
             items-center justify-center bg-gray-50 p-4 animate-[popIn_0.5s_ease-out_forwards]`}
                 >
