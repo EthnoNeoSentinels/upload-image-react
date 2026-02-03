@@ -42,7 +42,9 @@ export default function ImageUpload({
   };
 
   //Hidden file input element
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
@@ -58,7 +60,10 @@ export default function ImageUpload({
     let isError = false;
     let errorMsg = "";
 
-    if (!file.type.startsWith("image/")) {
+    if (file.size === 0) {
+      errorMsg = "File is empty";
+      isError = true;
+    } else if (!file.type.startsWith("image/")) {
       errorMsg = "Only image files are allowed.";
       isError = true;
     } else if (file.size > imageSizeRequired) {
@@ -83,6 +88,11 @@ export default function ImageUpload({
     //if any error occur before, it interrupt the action,
     // no going to check network error
     if (isError) {
+      const isValidImage = await checkImageCorruption(tempUrl);
+      if (!isValidImage) {
+        errorMsg = "File is corrupted or unreadable.";
+        isError = true;
+      }
       return;
     }
 
@@ -115,8 +125,19 @@ export default function ImageUpload({
         progress: 100,
       });
     }, 2000);
+  };
 
-    //axios
+  const checkImageCorruption = (url: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = url;
+
+      // If it loads correctly, it is NOT corrupted
+      img.onload = () => resolve(true);
+
+      // If it errors, the binary data is bad
+      img.onerror = () => resolve(false);
+    });
   };
 
   const updateImageStatus = (uid: string, updates: Partial<ImageUrl>) => {

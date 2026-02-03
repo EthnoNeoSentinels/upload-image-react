@@ -5,7 +5,7 @@ import UploadImageApp from "./UploadImage/UploadImageApp";
 function App() {
   const [imageUrlArray, setImageUrlArray] = useState<ImageUrl[]>([]);
 
-  // console.log(imageUrlArray);
+  console.log(imageUrlArray);
 
   return (
     <>
@@ -26,7 +26,6 @@ function App() {
           previewImageGap="gap-2" //default is 2
           imageSizeRequired={5 * 1024 * 1024} //default is 5MB
           imageSizeText="5MB" //if any size is modify change the text at here
-
         />
       </div>
     </>
