@@ -71,6 +71,13 @@ export default function ImageUpload({
       isError = true;
     }
 
+    if (!isError) {
+      const isValidImage = await checkImageCorruption(tempUrl);
+      if (!isValidImage) {
+        errorMsg = "File is corrupted or unreadable.";
+        isError = true;
+      }
+    }
     // Prepare to insert image in uploading / error status
     const newImageItem: ImageUrl = {
       uid: newUid,
@@ -82,30 +89,19 @@ export default function ImageUpload({
     };
 
     setImageUrlArray((prev) => [...prev, newImageItem]);
-
     event.target.value = "";
 
     //if any error occur before, it interrupt the action,
-    // no going to check network error
     if (isError) {
-      const isValidImage = await checkImageCorruption(tempUrl);
-      if (!isValidImage) {
-        errorMsg = "File is corrupted or unreadable.";
-        isError = true;
-      }
       return;
     }
 
-    // A. The Progress Timer (Ticks every 200ms)
     const uploadInterval = setInterval(() => {
       setImageUrlArray((prevArray) => {
         return prevArray.map((image) => {
-          // Only update THIS specific image
           if (image.uid !== newUid || image.status !== "uploading") {
             return image;
           }
-
-          // Cap simulated progress at 90% until finished
           const nextProgress = image.progress + 20;
           return {
             ...image,
@@ -115,11 +111,9 @@ export default function ImageUpload({
       });
     }, 200);
 
-    // B. The Finish Timer (Finishes after 2 seconds)
     setTimeout(() => {
-      clearInterval(uploadInterval); // Stop the progress ticker
+      clearInterval(uploadInterval); 
 
-      // Mark as done
       updateImageStatus(newUid, {
         status: "done",
         progress: 100,
