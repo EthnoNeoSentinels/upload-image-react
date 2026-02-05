@@ -1,0 +1,42 @@
+
+    // // Prepare to insert image in uploading / error status
+    // const newImageItem: ImageUrl = {
+    //   uid: newUid,
+    //   name: file.name,
+    //   status: isError ? "error" : "uploading",
+    //   url: tempUrl,
+    //   progress: 0,
+    //   errorMsg: isError ? errorMsg : "",
+    // };
+
+    // setImageUrlArray((prev) => [...prev, newImageItem]);
+    // event.target.value = "";
+
+    // //if any error occur before, it interrupt the action,
+    // if (isError) {
+    //   return;
+    // }
+
+    // const uploadInterval = setInterval(() => {
+    //   setImageUrlArray((prevArray) => {
+    //     return prevArray.map((image) => {
+    //       if (image.uid !== newUid || image.status !== "uploading") {
+    //         return image;
+    //       }
+    //       const nextProgress = image.progress + 20;
+    //       return {
+    //         ...image,
+    //         progress: nextProgress >= 90 ? 90 : nextProgress,
+    //       };
+    //     });
+    //   });
+    // }, 200);
+
+    // setTimeout(() => {
+    //   clearInterval(uploadInterval);
+
+    //   updateImageStatus(newUid, {
+    //     status: "done",
+    //     progress: 100,
+    //   });
+    // }, 2000);
