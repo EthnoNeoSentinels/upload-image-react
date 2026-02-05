@@ -44,8 +44,10 @@ export default function ImageUpload({
   const [isZoomIn, setIsZoomIn] = useState(false);
   const [zoomInImage, setZoomInImage] = useState<ImageUrl>();
   // const [isCrop, setIsCrop] = useState(false);
-  const [tempCropImage, setTempCropImage] = useState<string | null>(null);
+  const [tempCropImage, setTempCropImage] = useState<ImageUrl | null>(null);
   const [originalFileName, setOriginalFileName] = useState<string>("");
+
+  console.log(imageUrlArray);
 
   //Upload Button
   const handleButtonClick = () => {
@@ -83,32 +85,45 @@ export default function ImageUpload({
       isError = true;
     }
 
-    if (file.size === 0) {
-      alert("File is empty");
-      return;
-    }
-    if (!file.type.startsWith("image/")) {
-      alert("Only image files are allowed.");
-      return;
-    }
-    if (file.size > imageSizeRequired) {
-      alert("File is too big! Max " + imageSizeText + ".");
-      return;
+    if (!isError) {
+      const isValidImage = await checkImageCorruption(tempUrl);
+      if (!isValidImage) {
+        errorMsg = "File is corrupted or unreadable.";
+        isError = true;
+      }
+      const newImageItem: ImageUrl = {
+        uid: newUid,
+        name: file.name,
+        status: isError ? "error" : "uploading",
+        url: tempUrl,
+        progress: 0,
+        errorMsg: isError ? errorMsg : "",
+      };
+
+      setImageUrlArray((prev) => [...prev, newImageItem]);
     }
 
-    
-    const isValidImage = await checkImageCorruption(tempUrl);
-    if (!isValidImage) {
-      alert("File is corrupted or unreadable.");
+    event.target.value = "";
+
+    //if any error occur before, it interrupt the action,
+    if (isError) {
       return;
     }
-
     setOriginalFileName(file.name);
-    setTempCropImage(tempUrl);
+    setTempCropImage(newImageItem);
   };
 
-  const handleCropCancel = () => {
+  const handleCropCancel = (uid: string) => {
     setTempCropImage(null);
+
+    setImageUrlArray((previousImages) => {
+      const imagesAfterRemoval = previousImages.filter((image) => {
+        const notThisImage = image.uid !== uid;
+        return notThisImage;
+      });
+
+      return imagesAfterRemoval;
+    });
   };
 
   const checkImageCorruption = (url: string): Promise<boolean> => {
@@ -116,12 +131,71 @@ export default function ImageUpload({
       const img = new Image();
       img.src = url;
 
-      // If it loads correctly, it is NOT corrupted
+      // If it loads correctly, it is not corrupted
       img.onload = () => resolve(true);
 
       // If it errors, the binary data is bad
       img.onerror = () => resolve(false);
     });
+  };
+
+  const handleCropConfirm = () => {
+    //get the current crop image
+    const cropper = cropperRef.current;
+    if (!cropper) return;
+
+    const canvas = cropper.getCanvas();
+    if (!canvas) return;
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+
+      const croppedUrl = URL.createObjectURL(blob);
+      const newUid = crypto.randomUUID();
+
+      const newImageItem: ImageUrl = {
+        uid: newUid,
+        name: originalFileName,
+        status: "uploading",
+        url: croppedUrl,
+        progress: 0,
+        errorMsg: "",
+      };
+
+      // add to array
+      setImageUrlArray((prev) => [...prev, newImageItem]);
+
+      // close the crop window
+      setTempCropImage(null);
+
+      // Start upload
+      startUploadingImage(newUid);
+    }, "image/png");
+  };
+
+  const startUploadingImage = (uid: string) => {
+    const uploadInterval = setInterval(() => {
+      setImageUrlArray((prevArray) => {
+        return prevArray.map((image) => {
+          if (image.uid !== uid || image.status !== "uploading") {
+            return image;
+          }
+          const nextProgress = image.progress + 20;
+          return {
+            ...image,
+            progress: nextProgress >= 90 ? 90 : nextProgress,
+          };
+        });
+      });
+    }, 200);
+
+    setTimeout(() => {
+      clearInterval(uploadInterval);
+      updateImageStatus(uid, {
+        status: "done",
+        progress: 100,
+      });
+    }, 2000);
   };
 
   const updateImageStatus = (uid: string, updates: Partial<ImageUrl>) => {
@@ -172,17 +246,17 @@ export default function ImageUpload({
                 <div className="w-full h-full">
                   <Cropper
                     ref={cropperRef}
-                    src={tempCropImage}
+                    src={tempCropImage.url}
                     className="cropper w-full h-full"
                   />
                 </div>
               </div>
             </div>
             <div className="">
-              {/* Control Bar */}
+              {/* conrtol button */}
               <div className="h-20 flex items-center justify-center gap-5">
                 <button
-                  onClick={handleCropCancel}
+                  onClick={() => handleCropCancel(tempCropImage.uid)}
                   className="px-4 py-3 rounded-lg bg-gray-600 
               font-bold text-white cursor-pointer
                hover:bg-gray-700 active:bg-gray-500"
@@ -190,7 +264,7 @@ export default function ImageUpload({
                   Cancel
                 </button>
                 <button
-                  // onClick={handleCropConfirm}
+                  onClick={handleCropConfirm}
                   className="px-5 py-3 rounded-lg bg-blue-600 
               font-bold text-white cursor-pointer
                hover:bg-blue-700 active:bg-blue-500"
