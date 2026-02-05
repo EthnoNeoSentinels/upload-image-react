@@ -2,6 +2,11 @@ import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 import type { ImageUrl } from "./types";
 import ImageZoomIn from "./ImageZoomIn";
 import ImagePreviewItem from "./ImagePreviewItem";
+//crop features import library
+//lib = react-advanced-cropper
+import { Cropper, type CropperRef } from "react-advanced-cropper";
+import "react-advanced-cropper/dist/style.css";
+import columbina1 from "../assets/columbina1.jpeg";
 
 interface ImageUploadProps {
   entireWindowsWidth: string;
@@ -32,9 +37,15 @@ export default function ImageUpload({
   //useRef to handle hidden file input element
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  //useRef to
+  const cropperRef = useRef<CropperRef>(null);
+
   //state declarations
   const [isZoomIn, setIsZoomIn] = useState(false);
   const [zoomInImage, setZoomInImage] = useState<ImageUrl>();
+  // const [isCrop, setIsCrop] = useState(false);
+  const [tempCropImage, setTempCropImage] = useState<string | null>(null);
+  const [originalFileName, setOriginalFileName] = useState<string>("");
 
   //Upload Button
   const handleButtonClick = () => {
@@ -78,47 +89,51 @@ export default function ImageUpload({
         isError = true;
       }
     }
-    // Prepare to insert image in uploading / error status
-    const newImageItem: ImageUrl = {
-      uid: newUid,
-      name: file.name,
-      status: isError ? "error" : "uploading",
-      url: tempUrl,
-      progress: 0,
-      errorMsg: isError ? errorMsg : "",
-    };
 
-    setImageUrlArray((prev) => [...prev, newImageItem]);
-    event.target.value = "";
+    setOriginalFileName(file.name);
+    setTempCropImage(tempUrl);
 
-    //if any error occur before, it interrupt the action,
-    if (isError) {
-      return;
-    }
+    // // Prepare to insert image in uploading / error status
+    // const newImageItem: ImageUrl = {
+    //   uid: newUid,
+    //   name: file.name,
+    //   status: isError ? "error" : "uploading",
+    //   url: tempUrl,
+    //   progress: 0,
+    //   errorMsg: isError ? errorMsg : "",
+    // };
 
-    const uploadInterval = setInterval(() => {
-      setImageUrlArray((prevArray) => {
-        return prevArray.map((image) => {
-          if (image.uid !== newUid || image.status !== "uploading") {
-            return image;
-          }
-          const nextProgress = image.progress + 20;
-          return {
-            ...image,
-            progress: nextProgress >= 90 ? 90 : nextProgress,
-          };
-        });
-      });
-    }, 200);
+    // setImageUrlArray((prev) => [...prev, newImageItem]);
+    // event.target.value = "";
 
-    setTimeout(() => {
-      clearInterval(uploadInterval); 
+    // //if any error occur before, it interrupt the action,
+    // if (isError) {
+    //   return;
+    // }
 
-      updateImageStatus(newUid, {
-        status: "done",
-        progress: 100,
-      });
-    }, 2000);
+    // const uploadInterval = setInterval(() => {
+    //   setImageUrlArray((prevArray) => {
+    //     return prevArray.map((image) => {
+    //       if (image.uid !== newUid || image.status !== "uploading") {
+    //         return image;
+    //       }
+    //       const nextProgress = image.progress + 20;
+    //       return {
+    //         ...image,
+    //         progress: nextProgress >= 90 ? 90 : nextProgress,
+    //       };
+    //     });
+    //   });
+    // }, 200);
+
+    // setTimeout(() => {
+    //   clearInterval(uploadInterval);
+
+    //   updateImageStatus(newUid, {
+    //     status: "done",
+    //     progress: 100,
+    //   });
+    // }, 2000);
   };
 
   const checkImageCorruption = (url: string): Promise<boolean> => {
@@ -174,6 +189,47 @@ export default function ImageUpload({
           onCloseZoomIn={handleCloseZoomIn}
           zoomInImage={zoomInImage}
         />
+
+        {/* CROPPER MODAL (Only shows when tempCropImage is set) */}
+
+        {/* {tempCropImage && ( */}
+
+        <div className="fixed top-0 left-0 w-full h-full z-50 bg-black/50 flex flex-col justify-between items-center">
+          <div className="w-full h-full flex justify-center items-center">
+            <div className="bg-white w-[1000px] h-[500px]">
+              <div className="w-full h-full">
+                <Cropper
+                  ref={cropperRef}
+                  src={columbina1}
+                  className="cropper w-full h-full"
+                  stencilProps={{ aspectRatio: 1 }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="">
+            {/* Control Bar */}
+            <div className="h-20 flex items-center justify-center gap-5">
+              <button
+                // onClick={handleCropCancel}
+                className="px-4 py-3 rounded-lg bg-gray-600 
+              font-bold text-white cursor-pointer
+               hover:bg-gray-700 active:bg-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                // onClick={handleCropConfirm}
+                className="px-5 py-3 rounded-lg bg-blue-600 
+              font-bold text-white cursor-pointer
+               hover:bg-blue-700 active:bg-blue-500"
+              >
+                Upload Cropped Image
+              </button>
+            </div>
+          </div>
+        </div>
+        {/* )} */}
 
         <ImagePreviewItem
           // Allow to pass in array

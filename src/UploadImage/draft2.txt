@@ -1,0 +1,162 @@
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
+import type { ImageUrl } from "./types";
+import ImageZoomIn from "./ImageZoomIn";
+import ImagePreviewItem from "./ImagePreviewItem";
+//crop features import library
+import { Cropper, type CropperRef } from "react-advanced-cropper";
+import "react-advanced-cropper/dist/style.css";
+
+interface ImageUploadProps {
+  entireWindowsWidth: string;
+  previewImageWidth: string;
+  previewImageHeight: string;
+  imageSizeRequired: number;
+  imageUrlArray: ImageUrl[];
+  setImageUrlArray: Dispatch<SetStateAction<ImageUrl[]>>;
+  imageSizeText: string;
+  previewImageGap: string;
+}
+
+export default function ImageUpload({
+  imageUrlArray,
+  setImageUrlArray,
+  imageSizeRequired = 5 * 1024 * 1024,
+  imageSizeText = "5MB",
+  entireWindowsWidth,
+  previewImageWidth,
+  previewImageHeight,
+  previewImageGap,
+}: ImageUploadProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropperRef = useRef<CropperRef>(null);
+
+  const [isZoomIn, setIsZoomIn] = useState(false);
+  const [zoomInImage, setZoomInImage] = useState<ImageUrl>();
+  
+  // Crop state
+  const [tempCropImage, setTempCropImage] = useState<string | null>(null);
+  const [originalFileName, setOriginalFileName] = useState<string>("");
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const tempUrl = URL.createObjectURL(file);
+
+    let isError = false;
+    // ... (Your existing validation logic here) ...
+    if (file.size === 0 || !file.type.startsWith("image/")) isError = true;
+
+    if (!isError) {
+      setOriginalFileName(file.name);
+      setTempCropImage(tempUrl); // Triggers the modal
+      event.target.value = ""; // Reset input
+    }
+  };
+
+  // The missing handler to actually save the crop
+  const handleCropConfirm = () => {
+    if (cropperRef.current) {
+        const canvas = cropperRef.current.getCanvas();
+        if (canvas) {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    const newUrl = URL.createObjectURL(blob);
+                    const newUid = crypto.randomUUID();
+                    
+                    // Add to list as "uploading"
+                    const newImageItem: ImageUrl = {
+                        uid: newUid,
+                        name: originalFileName,
+                        status: "done", // Assuming instant client-side crop for now
+                        url: newUrl,
+                        progress: 100,
+                        errorMsg: "",
+                    };
+                    setImageUrlArray((prev) => [...prev, newImageItem]);
+                    setTempCropImage(null); // Close modal
+                }
+            });
+        }
+    }
+  };
+
+  const handleCropCancel = () => {
+    setTempCropImage(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // ... (Keep your existing helpers: checkImageCorruption, updateImageStatus, etc.) ...
+  
+  // ... (Keep your existing Zoom handlers) ...
+  const handleCloseZoomIn = () => setIsZoomIn(false);
+
+  return (
+    <>
+      <div className={`${entireWindowsWidth}`}>
+        <ImageZoomIn
+          isZoomIn={isZoomIn}
+          onCloseZoomIn={handleCloseZoomIn}
+          zoomInImage={zoomInImage}
+        />
+
+        {/* CROPPER MODAL - Only shows when file is selected */}
+        {tempCropImage && (
+          <div className="fixed top-0 left-0 w-full h-full z-50 bg-black/80 flex flex-col justify-between items-center">
+            <div className="w-full h-full flex justify-center items-center p-10">
+              <div className="bg-black w-full max-w-[1000px] h-[600px] relative shadow-2xl">
+                <Cropper
+                  ref={cropperRef}
+                  src={tempCropImage}
+                  className="cropper w-full h-full"
+                  // KEY CHANGE IS HERE:
+                  stencilProps={{ aspectRatio: undefined, grid: true }}
+                />
+              </div>
+            </div>
+            
+            {/* Control Bar */}
+            <div className="w-full h-24 bg-gray-900 flex items-center justify-center gap-5 border-t border-gray-700">
+              <button
+                onClick={handleCropCancel}
+                className="px-6 py-2 rounded-lg bg-gray-700 font-bold text-white hover:bg-gray-600 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCropConfirm}
+                className="px-6 py-2 rounded-lg bg-blue-600 font-bold text-white hover:bg-blue-500 transition shadow-lg"
+              >
+                Confirm Crop
+              </button>
+            </div>
+          </div>
+        )}
+
+        <ImagePreviewItem
+           // ... (Your existing props) ...
+           imageUrlArray={imageUrlArray}
+           handleButtonClick={handleButtonClick}
+           handleFileChange={handleFileChange}
+           // ...
+           previewImageWidth={previewImageWidth}
+           previewImageHeight={previewImageHeight}
+           previewImageGap={previewImageGap}
+        />
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          hidden
+          accept="image/*"
+          onChange={handleFileChange}
+        />
+      </div>
+    </>
+  );
+}
