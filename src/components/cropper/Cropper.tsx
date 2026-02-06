@@ -1,7 +1,7 @@
 import React, { forwardRef, type Ref } from 'react';
 import { isUndefined } from 'advanced-cropper';
 import { type StencilSize } from 'advanced-cropper/extensions/stencil-size';
-import { CustomCropperProps, CustomCropperRef, ExtendedSettings, SettingsExtension } from '../../types';
+import type { CustomCropperProps, CustomCropperRef, ExtendedSettings, SettingsExtension } from '../../types';
 import { hybridStencilAutoZoom } from '../../deprecated/hybridAutoZoom';
 import { useDeprecationWarning } from '../../hooks/useDeprecationWarning';
 import {  AbstractCropper, type AbstractCropperIntrinsicProps } from '../AbstractCropper';
