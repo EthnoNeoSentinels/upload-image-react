@@ -7,6 +7,7 @@ import ImagePreviewItem from "./ImagePreviewItem";
 //lib = react-advanced-cropper
 // import { Cropper, type CropperRef } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/style.css";
+import { Cropper, type CropperRef} from "../components/cropper/Cropper";
 
 interface ImageUploadProps {
   entireWindowsWidth: string;
@@ -38,7 +39,7 @@ export default function ImageUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   //useRef to
-  // const cropperRef = useRef<CropperRef>(null);
+  const cropperRef = useRef<CropperRef>(null);
 
   //state declarations
   const [isZoomIn, setIsZoomIn] = useState(false);
@@ -240,7 +241,7 @@ export default function ImageUpload({
             <div className="w-full h-full flex justify-center items-center">
               <div className="bg-white w-250 h-125">
                 <div className="w-full h-full">
-                  {/* <Cropper
+                  <Cropper
                     ref={cropperRef}
                     src={tempCropImage.url}
                     className="cropper w-full h-full"
@@ -254,7 +255,7 @@ export default function ImageUpload({
                       moveImage: true,
                       scaleImage: true,
                     }}
-                  /> */}
+                  />
                 </div>
               </div>
             </div>

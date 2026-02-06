@@ -1,0 +1,26 @@
+import type { ExtendedSettings, SettingsExtension } from '../types';
+import type { AbstractCropperIntrinsicProps } from '../components/AbstractCropper';
+import { defaultSettings } from '../service/constants';
+import type { CoreSettings, DefaultSettings, ModifierSettings } from 'advanced-cropper';
+
+type Props<Extension extends SettingsExtension> = AbstractCropperIntrinsicProps<ExtendedSettings<Extension>>;
+
+export function useAbstractCropperProps<Extension extends SettingsExtension>(
+	props: Props<Extension>,
+	settings: string[] = defaultSettings,
+) {
+	const result: any = { settings: {}, props: {} };
+
+	(Object.keys(props) as (keyof typeof props)[]).forEach((key) => {
+		if (settings.some((setting) => setting === key)) {
+			result.settings[key] = props[key];
+		} else {
+			result.props[key] = props[key];
+		}
+	});
+
+	return result as {
+		settings: Extension & Partial<DefaultSettings & CoreSettings & ModifierSettings>;
+		props: Props<Extension>;
+	};
+}

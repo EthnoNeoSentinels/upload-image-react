@@ -12,7 +12,7 @@ import {
     type InitializeSettings,
 } from 'advanced-cropper';
 
-import {
+import type {
 	CropperBackgroundWrapperComponent,
 	CropperWrapperComponent,
 	StencilComponent,
@@ -27,12 +27,12 @@ import {
 import { CropperStateHook, CropperInstanceSettings, CropperInstanceSettingsProp } from '../hooks/useCropperInstance';
 import { createCropper } from '../service/cropper';
 import { AbstractCropperHookProps, useAbstractCropper } from '../hooks/useAbstractCropper';
-import { StretchableBoundary } from './service/StretchableBoundary';
-import { CropperWrapper } from './service/CropperWrapper';
-import { CropperBackgroundImage } from './service/CropperBackgroundImage';
-import { CropperCanvas } from './service/CropperCanvas';
+import { StretchableBoundary } from '../service/StretchableBoundary';
+import { CropperWrapper } from '../service/CropperWrapper';
+import { CropperBackgroundImage } from '../service/CropperBackgroundImage';
+import { CropperCanvas } from '../service/CropperCanvas';
 import { RectangleStencil } from './stencils/RectangleStencil';
-import { CropperBackgroundWrapper } from './service/CropperBackgroundWrapper';
+import { CropperBackgroundWrapper } from '../service/CropperBackgroundWrapper';
 
 export type AbstractCropperSettingsProp<Settings extends CropperInstanceSettings> =
 	CropperInstanceSettingsProp<Settings>;
