@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "axios": "^1.13.4",
+    "cropperjs": "^2.1.0",
     "react": "^19.2.0",
     "react-advanced-cropper": "^0.20.1",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-image-crop": "^11.0.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

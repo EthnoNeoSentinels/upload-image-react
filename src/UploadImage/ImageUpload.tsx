@@ -5,8 +5,8 @@ import ImagePreviewItem from "./ImagePreviewItem";
 
 //crop features import library
 //lib = react-advanced-cropper
-import { Cropper, type CropperRef } from "react-advanced-cropper";
-import "react-advanced-cropper/dist/style.css";
+// import { Cropper, type CropperRef } from "react-advanced-cropper";
+// import "react-advanced-cropper/dist/style.css";
 
 interface ImageUploadProps {
   entireWindowsWidth: string;
@@ -38,7 +38,7 @@ export default function ImageUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   //useRef to
-  const cropperRef = useRef<CropperRef>(null);
+  // const cropperRef = useRef<CropperRef>(null);
 
   //state declarations
   const [isZoomIn, setIsZoomIn] = useState(false);
@@ -91,24 +91,37 @@ export default function ImageUpload({
         errorMsg = "File is corrupted or unreadable.";
         isError = true;
       }
-      const newImageItem: ImageUrl = {
-        uid: newUid,
-        name: file.name,
-        status: isError ? "error" : "uploading",
-        url: tempUrl,
-        progress: 0,
-        errorMsg: isError ? errorMsg : "",
-      };
-
-      setImageUrlArray((prev) => [...prev, newImageItem]);
     }
 
     event.target.value = "";
 
     //if any error occur before, it interrupt the action,
     if (isError) {
+      const newImageItem: ImageUrl = {
+        uid: newUid,
+        name: file.name,
+        status: "error",
+        url: tempUrl,
+        progress: 0,
+        errorMsg: isError ? errorMsg : "",
+      };
+
+      setImageUrlArray((prev) => [...prev, newImageItem]);
+
       return;
     }
+
+    //if no error store
+    const newImageItem: ImageUrl = {
+      uid: newUid,
+      name: file.name,
+      status: "uploading",
+      url: tempUrl,
+      progress: 0,
+      errorMsg: isError ? errorMsg : "",
+    };
+
+    setImageUrlArray((prev) => [...prev, newImageItem]);
     setOriginalFileName(file.name);
     setTempCropImage(newImageItem);
   };
@@ -139,41 +152,28 @@ export default function ImageUpload({
     });
   };
 
-  const handleCropConfirm = () => {
+  const handleCropConfirm = (uid: string) => {
     //get the current crop image
-    const cropper = cropperRef.current;
-    if (!cropper) return;
+    // const cropper = cropperRef.current;
+    // if (!cropper) return;
 
-    const canvas = cropper.getCanvas();
-    if (!canvas) return;
+    // const canvas = cropper.getCanvas();
+    // if (!canvas) return;
 
-    canvas.toBlob((blob) => {
-      if (!blob) return;
+    // canvas.toBlob((blob) => {
+    //   if (!blob) return;
 
-      const croppedUrl = URL.createObjectURL(blob);
-      const newUid = crypto.randomUUID();
+    //   const croppedUrl = URL.createObjectURL(blob);
 
-      const newImageItem: ImageUrl = {
-        uid: newUid,
-        name: originalFileName,
-        status: "uploading",
-        url: croppedUrl,
-        progress: 0,
-        errorMsg: "",
-      };
+    //   // close the crop window
+    //   setTempCropImage(null);
 
-      // add to array
-      setImageUrlArray((prev) => [...prev, newImageItem]);
-
-      // close the crop window
-      setTempCropImage(null);
-
-      // Start upload
-      startUploadingImage(newUid);
-    }, "image/png");
+    //   // Start upload
+    //   startUploadingImage(uid, croppedUrl);
+    // }, "image/png");
   };
 
-  const startUploadingImage = (uid: string) => {
+  const startUploadingImage = (uid: string, croppedUrl: string) => {
     const uploadInterval = setInterval(() => {
       setImageUrlArray((prevArray) => {
         return prevArray.map((image) => {
@@ -183,6 +183,7 @@ export default function ImageUpload({
           const nextProgress = image.progress + 20;
           return {
             ...image,
+            url: croppedUrl,
             progress: nextProgress >= 90 ? 90 : nextProgress,
           };
         });
@@ -244,11 +245,7 @@ export default function ImageUpload({
             <div className="w-full h-full flex justify-center items-center">
               <div className="bg-white w-250 h-125">
                 <div className="w-full h-full">
-                  <Cropper
-                    ref={cropperRef}
-                    src={tempCropImage.url}
-                    className="cropper w-full h-full"
-                  />
+                  
                 </div>
               </div>
             </div>
@@ -264,7 +261,7 @@ export default function ImageUpload({
                   Cancel
                 </button>
                 <button
-                  onClick={handleCropConfirm}
+                  onClick={() => handleCropConfirm(tempCropImage.uid)}
                   className="px-5 py-3 rounded-lg bg-blue-600 
               font-bold text-white cursor-pointer
                hover:bg-blue-700 active:bg-blue-500"
