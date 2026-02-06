@@ -6,7 +6,7 @@ import ImagePreviewItem from "./ImagePreviewItem";
 //crop features import library
 //lib = react-advanced-cropper
 // import { Cropper, type CropperRef } from "react-advanced-cropper";
-// import "react-advanced-cropper/dist/style.css";
+import "react-advanced-cropper/dist/style.css";
 
 interface ImageUploadProps {
   entireWindowsWidth: string;
@@ -156,18 +156,13 @@ export default function ImageUpload({
     //get the current crop image
     // const cropper = cropperRef.current;
     // if (!cropper) return;
-
     // const canvas = cropper.getCanvas();
     // if (!canvas) return;
-
     // canvas.toBlob((blob) => {
     //   if (!blob) return;
-
     //   const croppedUrl = URL.createObjectURL(blob);
-
     //   // close the crop window
     //   setTempCropImage(null);
-
     //   // Start upload
     //   startUploadingImage(uid, croppedUrl);
     // }, "image/png");
@@ -245,7 +240,21 @@ export default function ImageUpload({
             <div className="w-full h-full flex justify-center items-center">
               <div className="bg-white w-250 h-125">
                 <div className="w-full h-full">
-                  
+                  {/* <Cropper
+                    ref={cropperRef}
+                    src={tempCropImage.url}
+                    className="cropper w-full h-full"
+                    stencilProps={{
+                      movable: true,
+                      resizable: true,
+                      lines: true,
+                      // aspectRatio: NaN
+                    }}
+                    backgroundWrapperProps={{
+                      moveImage: true,
+                      scaleImage: true,
+                    }}
+                  /> */}
                 </div>
               </div>
             </div>
